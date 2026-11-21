@@ -1,0 +1,27 @@
+* 5-Stage SkyWater 130nm LVT Ring Oscillator Benchmark Netlist
+.model sky130_nfet_lvt nmos (
++ level=54 vth0=0.250 u0=520 toxe=4.1e-9 subthmod=1 nfactor=1.35 lint=1e-8 wint=1e-8
+)
+.model sky130_pfet_lvt pmos (
++ level=54 vth0=-0.250 u0=130 toxe=4.1e-9 subthmod=1 nfactor=1.40 lint=1e-8 wint=1e-8
+)
+
+.subckt sky130_inv_lvt in out vdd gnd
+M1 out in gnd gnd sky130_nfet_lvt w=0.50u l=0.15u
+M2 out in vdd vdd sky130_pfet_lvt w=2.00u l=0.15u
+.ends sky130_inv_lvt
+
+Vsupply vdd 0 PULSE(0 0.60V 0 50p 50p 800n 1600n)
+Ikick n1 0 PULSE(0 500nA 50p 50p 1n 800n 1600n)
+
+X1 n5 n1 vdd 0 sky130_inv_lvt
+X2 n1 n2 vdd 0 sky130_inv_lvt
+X3 n2 n3 vdd 0 sky130_inv_lvt
+X4 n3 n4 vdd 0 sky130_inv_lvt
+X5 n4 n5 vdd 0 sky130_inv_lvt
+
+.control
+tran 0.1n 400n
+plot v(n1)
+.endc
+.end
